@@ -121,3 +121,6 @@ class TestExtractMarkdown(unittest.TestCase):
             "Prefix ![Bing](https://www.bing.com) infix [Google](https://www.google.com) suffix."
         )
         self.assertListEqual([("Google", "https://www.google.com")], matches)
+
+if __name__ == "__main__":
+    unittest.main()
