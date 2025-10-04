@@ -1,6 +1,6 @@
 import unittest
 
-from splits import split_nodes_delimiter
+from splits import split_nodes_delimiter, split_nodes_image, split_nodes_link
 from textnode import TextNode, TextType
 
 class TestSplits(unittest.TestCase):
@@ -56,6 +56,38 @@ class TestSplits(unittest.TestCase):
         node = TextNode("Text with ` one delimiter", TextType.TEXT)
         with self.assertRaises(ValueError):
             split_nodes_delimiter([node], "`", TextType.CODE)
+    
+    def test_split_nodes_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.IMAGE, "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
+    
+    def test_split_nodes_link(self):
+        node = TextNode(
+            "This is text with an [image](https://i.imgur.com/zjjcJKZ.png) and another [second image](https://i.imgur.com/3elNhQu.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", TextType.TEXT),
+                TextNode("image", TextType.LINK, "https://i.imgur.com/zjjcJKZ.png"),
+                TextNode(" and another ", TextType.TEXT),
+                TextNode("second image", TextType.LINK, "https://i.imgur.com/3elNhQu.png"),
+            ],
+            new_nodes,
+        )
 
 if __name__ == "__main__":
     unittest.main()
